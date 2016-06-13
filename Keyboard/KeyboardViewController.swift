@@ -41,7 +41,9 @@ class KeyboardViewController: UIInputViewController {
     var forwardingView: ForwardingView!
     var layout: KeyboardLayout?
     var heightConstraint: NSLayoutConstraint?
-    
+
+    weak var delegate: AlphaKeyboardDelegate?
+
     var bannerView: SuggestionView?
 
     var currentMode: Int {
@@ -96,12 +98,7 @@ class KeyboardViewController: UIInputViewController {
 	
 	var keyboard_type: UIKeyboardType!
 	var preKeyboardType = UIKeyboardType.Default
-	
-    // TODO: why does the app crash if this isn't here?
-    convenience init() {
-        self.init(nibName: nil, bundle: nil)
-    }
-    
+
     // HACKHACK
     // Since UIApplication.sharedApplication().statusBarOrientation has been deprecated.
     // For now assume interfaceOrientation and device orientation are the same thing.
@@ -130,7 +127,8 @@ class KeyboardViewController: UIInputViewController {
 
     }
 
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    init(delegate: AlphaKeyboardDelegate) {
+        self.delegate = delegate
         NSUserDefaults.standardUserDefaults().registerDefaults([
             kAutoCapitalization: true,
             kPeriodShortcut: true,
@@ -146,7 +144,7 @@ class KeyboardViewController: UIInputViewController {
         
         self.currentInterfaceOrientation = KeyboardViewController.getInterfaceOrientation()
 
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        super.init(nibName: nil, bundle: nil)
 
 		InitializeLayout()
 
@@ -890,7 +888,7 @@ class KeyboardViewController: UIInputViewController {
 
     func InsertText(insertChar: String)
     {
-        self.textDocumentProxy.insertText(insertChar)
+        self.delegate!.didInsertString(insertChar)
 
         WordStore.CurrentWordStore().recordChar(insertChar)
 
