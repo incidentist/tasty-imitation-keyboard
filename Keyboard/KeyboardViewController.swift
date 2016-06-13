@@ -669,8 +669,8 @@ class KeyboardViewController: UIInputViewController {
             }()
             
             if charactersAreInCorrectState {
-                self.textDocumentProxy.deleteBackward()
-                self.textDocumentProxy.deleteBackward()
+                self.delegate?.didSignalIntentToDelete()
+                self.delegate?.didSignalIntentToDelete()
                 InsertText(".")
                 InsertText(" ")
             }
@@ -694,7 +694,7 @@ class KeyboardViewController: UIInputViewController {
     func backspaceDown(sender: KeyboardKey) {
         self.cancelBackspaceTimers()
         
-        self.textDocumentProxy.deleteBackward()
+        self.delegate?.didSignalIntentToDelete()
         WordStore.CurrentWordStore().DeleteBackward()
 
         self.setCapsIfNeeded()
@@ -715,7 +715,7 @@ class KeyboardViewController: UIInputViewController {
     func backspaceRepeatCallback() {
         self.playKeySound()
         
-        self.textDocumentProxy.deleteBackward()
+        self.delegate?.didSignalIntentToDelete()
         
         self.setCapsIfNeeded()
     }
@@ -960,7 +960,7 @@ class KeyboardViewController: UIInputViewController {
 
             // Tapping on the suggestion replaces the word we've been inserting into the text buffer
             for _ in 0 ..< WordStore.CurrentWordStore().CurrentWord.characters.count {
-                self.textDocumentProxy.deleteBackward()
+                self.delegate?.didSignalIntentToDelete()
             }
 
             let insertionWord =
