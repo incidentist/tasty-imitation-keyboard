@@ -295,6 +295,7 @@ class KeyboardViewController: UIInputViewController {
         super.loadView()
 		
         self.bannerView = self.createBanner()
+        self.view.backgroundColor = UIColor(colorLiteralRed: 210.0/255, green: 213.0/255, blue: 218.0/255, alpha: 1.0)
         self.view.insertSubview(self.bannerView!, belowSubview: self.forwardingView)
     }
     
