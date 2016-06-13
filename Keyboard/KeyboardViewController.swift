@@ -42,7 +42,7 @@ class KeyboardViewController: UIInputViewController {
     var layout: KeyboardLayout?
     var heightConstraint: NSLayoutConstraint?
 
-    weak var delegate: AlphaKeyboardDelegate?
+    weak var delegate: TextInputProxy?
 
     var bannerView: SuggestionView?
 
@@ -127,7 +127,7 @@ class KeyboardViewController: UIInputViewController {
 
     }
 
-    init(delegate: AlphaKeyboardDelegate) {
+    init(delegate: TextInputProxy) {
         self.delegate = delegate
         NSUserDefaults.standardUserDefaults().registerDefaults([
             kAutoCapitalization: true,
@@ -669,8 +669,8 @@ class KeyboardViewController: UIInputViewController {
             }()
             
             if charactersAreInCorrectState {
-                self.delegate?.didSignalIntentToDelete()
-                self.delegate?.didSignalIntentToDelete()
+                self.delegate?.deleteText()
+                self.delegate?.deleteText()
                 InsertText(".")
                 InsertText(" ")
             }
@@ -694,7 +694,7 @@ class KeyboardViewController: UIInputViewController {
     func backspaceDown(sender: KeyboardKey) {
         self.cancelBackspaceTimers()
         
-        self.delegate?.didSignalIntentToDelete()
+        self.delegate?.deleteText()
         WordStore.CurrentWordStore().DeleteBackward()
 
         self.setCapsIfNeeded()
@@ -715,7 +715,7 @@ class KeyboardViewController: UIInputViewController {
     func backspaceRepeatCallback() {
         self.playKeySound()
         
-        self.delegate?.didSignalIntentToDelete()
+        self.delegate?.deleteText()
         
         self.setCapsIfNeeded()
     }
@@ -888,7 +888,7 @@ class KeyboardViewController: UIInputViewController {
 
     func InsertText(insertChar: String)
     {
-        self.delegate!.didInsertString(insertChar)
+        self.delegate!.insertText(insertChar)
 
         WordStore.CurrentWordStore().recordChar(insertChar)
 
@@ -960,7 +960,7 @@ class KeyboardViewController: UIInputViewController {
 
             // Tapping on the suggestion replaces the word we've been inserting into the text buffer
             for _ in 0 ..< WordStore.CurrentWordStore().CurrentWord.characters.count {
-                self.delegate?.didSignalIntentToDelete()
+                self.delegate?.deleteText()
             }
 
             let insertionWord =
