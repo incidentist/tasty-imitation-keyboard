@@ -198,6 +198,29 @@ func FailSafeKeyboard() -> Keyboard {
     return defaultKeyboard
 }
 
+func ChatterKeyboard(returnKey: Key) -> Keyboard {
+    let keyboard = Keyboard()
+
+    AddCharacters(keyboard, characters: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], row: 0, page: 0)
+    AddCharacters(keyboard, characters: ["A", "S", "D", "F", "G", "H", "J", "K", "L"], row: 1, page: 0)
+
+    keyboard.addKey(Key(.Shift), row: 2, page: 0)
+
+    AddCharacters(keyboard, characters: ["Z", "X", "C", "V", "B", "N", "M"], row: 2, page: 0)
+
+    keyboard.addKey(Key(.Backspace), row: 2, page: 0)
+
+    keyboard.addKey(Key.ModeChangeNumbersKey(), row: 3, page: 0)
+    keyboard.addKey(Key.SpaceKey(), row: 3, page: 0)
+    keyboard.addKey(Key.PeriodKey(), row: 3, page: 0)
+    keyboard.addKey(returnKey, row: 3, page: 0)
+
+    addNumericPage(keyboard)
+    addSymbolsPage(keyboard)
+
+    return keyboard
+}
+
 // defaultLanguageSpecificKeyboard.
 // Create a language-specific keyboard. Note that for now the only part that varies by language is the alpha page.
 //

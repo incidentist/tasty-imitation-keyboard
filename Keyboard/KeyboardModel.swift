@@ -269,7 +269,16 @@ class Key: Hashable {
     class func ReturnKey() -> Key
     {
         let returnKey = Key(.Return)
-        returnKey.uppercaseKeyCap = "Search" // SpecialUnicodeSymbols.ReturnSymbol
+        returnKey.uppercaseKeyCap = SpecialUnicodeSymbols.ReturnSymbol
+        returnKey.uppercaseOutput = "\n"
+        returnKey.lowercaseOutput = "\n"
+        return returnKey
+    }
+
+    class func SearchKey() -> Key
+    {
+        let returnKey = Key(.Return)
+        returnKey.uppercaseKeyCap = "Search"
         returnKey.uppercaseOutput = "\n"
         returnKey.lowercaseOutput = "\n"
         return returnKey

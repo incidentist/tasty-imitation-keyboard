@@ -194,11 +194,15 @@ class KeyboardViewController: UIInputViewController {
         }
     }
 
-    private func layoutHelper()
+    private func layoutHelper(keyboard: Keyboard?)
     {
-
         let proxy = textDocumentProxy
-        self.keyboard = defaultKeyboard(proxy.keyboardType!)
+
+        if let userDefinedKeyboard = keyboard {
+            self.keyboard = userDefinedKeyboard
+        } else {
+            self.keyboard = defaultKeyboard(proxy.keyboardType!)
+        }
 
         preKeyboardType = proxy.keyboardType!
 
@@ -239,10 +243,10 @@ class KeyboardViewController: UIInputViewController {
     */
     
     var constraintsAdded: Bool = false
-    func setupLayout() {
+    func setupLayout(keyboard: Keyboard?) {
         if !constraintsAdded {
             
-            layoutHelper()
+            layoutHelper(keyboard)
 
         }
     }
@@ -266,7 +270,7 @@ class KeyboardViewController: UIInputViewController {
 			return
 		}
 		
-		self.setupLayout()
+		self.setupLayout(nil)
         
 		let orientationSavvyBounds = CGRectMake(0, 0, self.view.bounds.width, self.heightForOrientation(self.currentInterfaceOrientation, withTopBanner: false))
 		
@@ -316,6 +320,16 @@ class KeyboardViewController: UIInputViewController {
         self.keyboardHeight = self.heightForOrientation(toInterfaceOrientation, withTopBanner: true)
         self.currentInterfaceOrientation = toInterfaceOrientation
     }
+
+    func showSearchButton() {
+        let keyboard = ChatterKeyboard(Key.SearchKey())
+        self.RebootKeyboard(keyboard)
+    }
+
+    func showReturnButton() {
+        let keyboard = ChatterKeyboard(Key.ReturnKey())
+        self.RebootKeyboard(keyboard)
+    }
     
     override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
         self.layout?.rasterizeKeys(false)
@@ -353,10 +367,10 @@ class KeyboardViewController: UIInputViewController {
     {
         NSUserDefaults.standardUserDefaults().setValue(languageCode, forKey: kActiveLanguageCode)
 
-        self.RebootKeyboard()
+        self.RebootKeyboard(nil)
     }
 
-    private func RebootKeyboard()
+    private func RebootKeyboard(keyboard: Keyboard?)
     {
         WordStore.CurrentWordStore().ResetContext()
 
@@ -370,7 +384,7 @@ class KeyboardViewController: UIInputViewController {
         self.keyboardHeight = self.heightForOrientation(self.currentInterfaceOrientation, withTopBanner: true)
 
         self.constraintsAdded = false
-        self.setupLayout()
+        self.setupLayout(keyboard)
     }
 
     private func tearDownSubViews() {
@@ -561,7 +575,7 @@ class KeyboardViewController: UIInputViewController {
 		dispatch_async(dispatch_get_main_queue(), {
 			if proxy.keyboardType! != self.preKeyboardType
 			{
-                self.RebootKeyboard()
+                self.RebootKeyboard(nil)
 			}
 			
 		})
