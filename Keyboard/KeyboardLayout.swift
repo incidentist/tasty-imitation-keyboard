@@ -163,9 +163,13 @@ class GlobalColors: NSObject {
 
     class var darkModeRegularKey: UIColor { get { return UIColor.whiteColor().colorWithAlphaComponent(CGFloat(0.3)) }}
 
-    class var lightModeSpecialKey: UIColor { get { return UIColor(red: CGFloat(177)/CGFloat(255), green: CGFloat(177)/CGFloat(255), blue: CGFloat(177)/CGFloat(255), alpha: 1) }}
+    class var lightModeSpecialKey: UIColor { get { return UIColor(red: CGFloat(203)/CGFloat(255), green: CGFloat(206)/CGFloat(255), blue: CGFloat(215)/CGFloat(255), alpha: 1) }}
 
     class var darkModeSpecialKey: UIColor { get { return UIColor.grayColor().colorWithAlphaComponent(CGFloat(0.3)) }}
+
+    class var lightModeSubmitKey: UIColor { get { return UIColor(red: CGFloat(203)/CGFloat(255), green: CGFloat(206)/CGFloat(255), blue: CGFloat(215)/CGFloat(255), alpha: 1) }}
+
+    class var darkModeSubmitKey: UIColor { get { return UIColor.grayColor().colorWithAlphaComponent(CGFloat(0.3)) }}
 
     class var darkModeShiftKeyDown: UIColor { get { return UIColor(red: CGFloat(214)/CGFloat(255), green: CGFloat(220)/CGFloat(255), blue: CGFloat(208)/CGFloat(255), alpha: 1) }}
 
@@ -196,6 +200,11 @@ class GlobalColors: NSObject {
     class func specialKey(darkMode: Bool) -> UIColor {
         return darkMode ? self.darkModeSpecialKey : self.lightModeSpecialKey
     }
+
+    class func submitKey(darkMode: Bool) -> UIColor {
+        return darkMode ? self.darkModeSubmitKey : self.lightModeSubmitKey
+    }
+
 }
 
 extension CGRect: Hashable {
@@ -482,7 +491,7 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
         case
         Key.KeyType.Return,
         Key.KeyType.KeyboardChange:
-            key.color = GlobalColors.specialKey(darkMode)
+            key.color = GlobalColors.submitKey(darkMode)
             
             //key.color = BluishColor
             
