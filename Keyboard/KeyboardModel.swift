@@ -260,7 +260,7 @@ class Key: Hashable {
     class func SpaceKey() -> Key
     {
         let space = Key(.Space)
-        space.uppercaseKeyCap = CurrentLanguageCode()
+        space.uppercaseKeyCap = "space"
         space.uppercaseOutput = " "
         space.lowercaseOutput = " "
         return space
