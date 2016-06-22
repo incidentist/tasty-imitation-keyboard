@@ -211,7 +211,6 @@ func ChatterKeyboard(returnKey: Key) -> Keyboard {
 
     keyboard.addKey(Key.ModeChangeNumbersKey(), row: 3, page: 0)
     keyboard.addKey(Key.SpaceKey(), row: 3, page: 0)
-    keyboard.addKey(Key.PeriodKey(), row: 3, page: 0)
     keyboard.addKey(returnKey, row: 3, page: 0)
 
     addNumericPage(keyboard)
