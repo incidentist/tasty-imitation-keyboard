@@ -278,7 +278,7 @@ class Key: Hashable {
     class func SearchKey() -> Key
     {
         let returnKey = Key(.Return)
-        returnKey.uppercaseKeyCap = "search"
+        returnKey.uppercaseKeyCap = "Search"
         returnKey.uppercaseOutput = "\n"
         returnKey.lowercaseOutput = "\n"
         return returnKey
