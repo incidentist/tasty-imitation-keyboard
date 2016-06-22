@@ -152,7 +152,6 @@ func addSymbolsPage(defaultKeyboard: Keyboard)
 func addDefaultBottomRowKeys(defaultKeyboard: Keyboard, modeChange: Key, pageNumber: Int)
 {
     defaultKeyboard.addKey(modeChange, row: 3, page: pageNumber)
-    defaultKeyboard.addKey(Key.NextKbdKey(), row: 3, page: pageNumber)
     defaultKeyboard.addKey(Key.SpaceKey(), row: 3, page: pageNumber)
     defaultKeyboard.addKey(Key.PeriodKey(), row: 3, page: pageNumber)
     defaultKeyboard.addKey(Key.ReturnKey(), row: 3, page: pageNumber)
@@ -243,7 +242,6 @@ func defaultLanguageSpecificKeyboard() -> Keyboard
 func addEmailBottomRowKeys(defaultKeyboard: Keyboard)
 {
     defaultKeyboard.addKey(Key.ModeChangeNumbersKey(), row: 3, page: 0)
-    defaultKeyboard.addKey(Key.NextKbdKey(), row: 3, page: 0)
     defaultKeyboard.addKey(Key.SpaceKey(), row: 3, page: 0)
     
     defaultKeyboard.addKey(Key.AtKey(), row: 3, page: 0)
@@ -270,7 +268,6 @@ func defaultKeyboardEmail() -> Keyboard {
 func addURLBottomRowKeys(defaultKeyboard: Keyboard)
 {
     defaultKeyboard.addKey(Key.ModeChangeNumbersKey(), row: 3, page: 0)
-    defaultKeyboard.addKey(Key.NextKbdKey(), row: 3, page: 0)
     defaultKeyboard.addKey(Key.SpaceKey(), row: 3, page: 0)
     
     defaultKeyboard.addKey(Key.SlashKey(), row: 3, page: 0)
@@ -299,8 +296,7 @@ func defaultKeyboardNumber() -> Keyboard {
     AddCharacters(defaultKeyboard, characters: ["4", "5", "6", ","], row: 1, page: 0)
     AddCharacters(defaultKeyboard, characters: ["7", "8", "9", "-"], row: 2, page: 0)
     AddCharacters(defaultKeyboard, characters: ["00","0"], row: 3, page: 0)
-		
-    defaultKeyboard.addKey(Key.NextKbdKey(), row: 3, page: 0)
+
 	defaultKeyboard.addKey(Key(.Backspace), row: 3, page: 0)
 
     return defaultKeyboard
