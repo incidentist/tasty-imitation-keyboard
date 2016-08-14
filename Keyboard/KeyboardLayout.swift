@@ -167,7 +167,7 @@ class GlobalColors: NSObject {
 
     class var darkModeSpecialKey: UIColor { get { return UIColor.grayColor().colorWithAlphaComponent(CGFloat(0.3)) }}
 
-    class var lightModeSubmitKey: UIColor { get { return UIColor(red: CGFloat(203)/CGFloat(255), green: CGFloat(206)/CGFloat(255), blue: CGFloat(215)/CGFloat(255), alpha: 1) }}
+    class var lightModeSubmitKey: UIColor { get { return UIColor(red: CGFloat(28)/CGFloat(255), green: CGFloat(126)/CGFloat(255), blue: CGFloat(251)/CGFloat(255), alpha: 1) }}
 
     class var darkModeSubmitKey: UIColor { get { return UIColor.grayColor().colorWithAlphaComponent(CGFloat(0.3)) }}
 
@@ -177,7 +177,7 @@ class GlobalColors: NSObject {
 
     class var darkModePopup: UIColor { get { return UIColor.grayColor() }}
 
-    class var lightModeUnderColor: UIColor { get { return UIColor(hue: (220/360.0), saturation: 0.04, brightness: 0.56, alpha: 1) }}
+    class var lightModeUnderColor: UIColor { get { return UIColor(red: CGFloat(38.6)/CGFloat(255), green: CGFloat(18)/CGFloat(255), blue: CGFloat(39.3)/CGFloat(255), alpha: 0.4) }}
 
     class var darkModeUnderColor: UIColor { get { return UIColor(red: CGFloat(38.6)/CGFloat(255), green: CGFloat(18)/CGFloat(255), blue: CGFloat(39.3)/CGFloat(255), alpha: 0.4) }}
 
@@ -494,11 +494,11 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
             key.color = GlobalColors.submitKey(darkMode)
             
             //key.color = BluishColor
-            
+
             // TODO: actually a bit different
             key.downColor = GlobalColors.regularKey(darkMode)
-            key.textColor = (darkMode ? GlobalColors.darkModeTextColor : GlobalColors.lightModeTextColor)
-            key.downTextColor = nil
+            key.textColor = GlobalColors.darkModeTextColor
+            key.downTextColor = GlobalColors.lightModeTextColor
         default:
             break
         }

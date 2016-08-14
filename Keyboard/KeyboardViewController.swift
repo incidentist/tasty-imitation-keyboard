@@ -254,7 +254,8 @@ class KeyboardViewController: UIInputViewController {
     // only available after frame becomes non-zero
     func darkMode() -> Bool {
         let darkMode = { () -> Bool in
-                return self.textDocumentProxy.keyboardAppearance == UIKeyboardAppearance.Dark
+            return true
+            //return self.textDocumentProxy.keyboardAppearance == UIKeyboardAppearance.Dark
         }()
 
         return darkMode
@@ -299,7 +300,7 @@ class KeyboardViewController: UIInputViewController {
         super.loadView()
 		
         self.bannerView = self.createBanner()
-        self.view.backgroundColor = UIColor(colorLiteralRed: 214.0/255, green: 217.0/255, blue: 224.0/255, alpha: 1.0)
+        self.view.backgroundColor = UIColor(colorLiteralRed: 38/255, green: 53/255, blue: 71/255, alpha: 1.0)
         self.view.insertSubview(self.bannerView!, belowSubview: self.forwardingView)
     }
     
