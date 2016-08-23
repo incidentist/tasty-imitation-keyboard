@@ -109,7 +109,9 @@ class Shape: UIView {
         }
         
         override func drawRect(rect: CGRect) {
-            let ctx = UIGraphicsGetCurrentContext()
+            guard let ctx = UIGraphicsGetCurrentContext() else {
+                return
+            }
             
             CGContextSaveGState(ctx)
             
@@ -159,13 +161,17 @@ func centerShape(fromSize: CGSize, toRect: CGRect) {
     let xOffset = (toRect.width - fromSize.width) / CGFloat(2)
     let yOffset = (toRect.height - fromSize.height) / CGFloat(2)
     
-    let ctx = UIGraphicsGetCurrentContext()
+    guard let ctx = UIGraphicsGetCurrentContext() else {
+        return
+    }
     CGContextSaveGState(ctx)
     CGContextTranslateCTM(ctx, xOffset, yOffset)
 }
 
 func endCenter() {
-    let ctx = UIGraphicsGetCurrentContext()
+    guard let ctx = UIGraphicsGetCurrentContext() else {
+        return
+    }
     CGContextRestoreGState(ctx)
 }
 
