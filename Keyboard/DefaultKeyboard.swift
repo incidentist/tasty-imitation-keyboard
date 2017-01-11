@@ -14,9 +14,9 @@ func languageSpecificKeyboard() -> Keyboard?
 
     let keyboardFileName = getKeyboardLayoutNameForLanguageCode(langCode)
 
-        if let path = NSBundle.mainBundle().pathForResource(keyboardFileName, ofType: "json")
+        if let path = Bundle.main.path(forResource: keyboardFileName, ofType: "json")
         {
-            if !NSFileManager().fileExistsAtPath(path) {
+            if !FileManager().fileExists(atPath: path) {
                 NSLog("File does not exist at \(path)")
                 return nil
             }
@@ -24,10 +24,10 @@ func languageSpecificKeyboard() -> Keyboard?
             // Keyboards have pages. Pages have rows.
             // Rows have keys.
             // Keys have characters.
-            if let jsonData = NSData(contentsOfFile: path)
+            if let jsonData = try? Data(contentsOf: URL(fileURLWithPath: path))
             {
                 do {
-                    let JSON = try NSJSONSerialization.JSONObjectWithData(jsonData, options:NSJSONReadingOptions(rawValue: 0))
+                    let JSON = try JSONSerialization.jsonObject(with: jsonData, options:JSONSerialization.ReadingOptions(rawValue: 0))
 
                     guard let JSONDictionary: NSDictionary = JSON as? NSDictionary else {
                         NSLog("Not a Dictionary")
@@ -58,7 +58,7 @@ func languageSpecificKeyboard() -> Keyboard?
                                                     // HACKHACK Splice in the shift key
                                                     if rowIndex == 2 {
 
-                                                        newKeyboard.addKey(Key(.Shift), row: rowIndex, page: pageIndex)
+                                                        newKeyboard.addKey(Key(.shift), row: rowIndex, page: pageIndex)
                                                     }
 
                                                     for oneKey in keys {
@@ -75,7 +75,7 @@ func languageSpecificKeyboard() -> Keyboard?
                                                                 let shiftLongPress = oneKeyRecord["shiftLongPress"] as? [String]
 
                                                                 let keyModel = Key(
-                                                                    type: .Character,
+                                                                    type: .character,
                                                                     label: label,
                                                                     longPress: longPress,
                                                                     shiftLabel: shiftLabel,
@@ -95,7 +95,7 @@ func languageSpecificKeyboard() -> Keyboard?
                     }
                     
                     
-                    newKeyboard.addKey(Key(.Backspace), row: 2, page: 0)
+                    newKeyboard.addKey(Key(.backspace), row: 2, page: 0)
                     
                     addNumericPage(newKeyboard)
                     addSymbolsPage(newKeyboard)
@@ -119,7 +119,7 @@ func languageSpecificKeyboard() -> Keyboard?
 }
 
 
-func addNumericPage(defaultKeyboard: Keyboard)
+func addNumericPage(_ defaultKeyboard: Keyboard)
 {
     AddSpecialCharacters(defaultKeyboard, characters: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], row: 0, page: 1)
     AddSpecialCharacters(defaultKeyboard, characters: ["-", "/", ":", ";", "(", ")", "$", "&", "@", "\""], row: 1, page: 1)
@@ -128,13 +128,13 @@ func addNumericPage(defaultKeyboard: Keyboard)
 
     AddSpecialCharacters(defaultKeyboard, characters: [".", ",", "?", "!", "'"], row: 2, page: 1)
 
-    defaultKeyboard.addKey(Key(.Backspace), row: 2, page: 1)
+    defaultKeyboard.addKey(Key(.backspace), row: 2, page: 1)
     
     addDefaultBottomRowKeys(defaultKeyboard, modeChange: Key.ModeChangeLettersKey(), pageNumber: 1)
 
 }
 
-func addSymbolsPage(defaultKeyboard: Keyboard)
+func addSymbolsPage(_ defaultKeyboard: Keyboard)
 {
     AddSpecialCharacters(defaultKeyboard, characters: ["[", "]", "{", "}", "#", "%", "^", "*", "+", "="], row: 0, page: 2)
     AddSpecialCharacters(defaultKeyboard, characters: ["_", "\\", "|", "~", "<", ">", "€", "£", "¥", "•"], row: 1, page: 2)
@@ -143,13 +143,13 @@ func addSymbolsPage(defaultKeyboard: Keyboard)
 
     AddSpecialCharacters(defaultKeyboard, characters: [".", ",", "?", "!", "'"], row: 2, page: 2)
 
-    defaultKeyboard.addKey(Key(.Backspace), row: 2, page: 2)
+    defaultKeyboard.addKey(Key(.backspace), row: 2, page: 2)
 
     addDefaultBottomRowKeys(defaultKeyboard, modeChange: Key.ModeChangeLettersKey(), pageNumber: 2)
     
 }
 
-func addDefaultBottomRowKeys(defaultKeyboard: Keyboard, modeChange: Key, pageNumber: Int)
+func addDefaultBottomRowKeys(_ defaultKeyboard: Keyboard, modeChange: Key, pageNumber: Int)
 {
     defaultKeyboard.addKey(modeChange, row: 3, page: pageNumber)
     defaultKeyboard.addKey(Key.SpaceKey(), row: 3, page: pageNumber)
@@ -157,17 +157,17 @@ func addDefaultBottomRowKeys(defaultKeyboard: Keyboard, modeChange: Key, pageNum
     defaultKeyboard.addKey(Key.ReturnKey(), row: 3, page: pageNumber)
 }
 
-func defaultKeyboard(keyboardType:UIKeyboardType) -> Keyboard
+func defaultKeyboard(_ keyboardType:UIKeyboardType) -> Keyboard
 {
 	switch keyboardType
     {
-    case .NumberPad, .DecimalPad:
+    case .numberPad, .decimalPad:
         return defaultKeyboardNumber()
         
-    case .EmailAddress:
+    case .emailAddress:
         return defaultKeyboardEmail()
         
-    case .URL, .WebSearch:
+    case .URL, .webSearch:
         return defaultKeyboardURL()
         
     default:
@@ -184,11 +184,11 @@ func FailSafeKeyboard() -> Keyboard {
     AddCharacters(defaultKeyboard, characters: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], row: 0, page: 0)
     AddCharacters(defaultKeyboard, characters: ["A", "S", "D", "F", "G", "H", "J", "K", "L"], row: 1, page: 0)
 	
-    defaultKeyboard.addKey(Key(.Shift), row: 2, page: 0)
+    defaultKeyboard.addKey(Key(.shift), row: 2, page: 0)
 
     AddCharacters(defaultKeyboard, characters: ["Z", "X", "C", "V", "B", "N", "M"], row: 2, page: 0)
 
-    defaultKeyboard.addKey(Key(.Backspace), row: 2, page: 0)
+    defaultKeyboard.addKey(Key(.backspace), row: 2, page: 0)
     
     addDefaultBottomRowKeys(defaultKeyboard, modeChange: Key.ModeChangeNumbersKey(), pageNumber: 0)
     addNumericPage(defaultKeyboard)
@@ -197,17 +197,17 @@ func FailSafeKeyboard() -> Keyboard {
     return defaultKeyboard
 }
 
-func ChatterKeyboard(returnKey: Key) -> Keyboard {
+func ChatterKeyboard(_ returnKey: Key) -> Keyboard {
     let keyboard = Keyboard()
 
     AddCharacters(keyboard, characters: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], row: 0, page: 0)
     AddCharacters(keyboard, characters: ["A", "S", "D", "F", "G", "H", "J", "K", "L"], row: 1, page: 0)
 
-    keyboard.addKey(Key(.Shift), row: 2, page: 0)
+    keyboard.addKey(Key(.shift), row: 2, page: 0)
 
     AddCharacters(keyboard, characters: ["Z", "X", "C", "V", "B", "N", "M"], row: 2, page: 0)
 
-    keyboard.addKey(Key(.Backspace), row: 2, page: 0)
+    keyboard.addKey(Key(.backspace), row: 2, page: 0)
 
     keyboard.addKey(Key.ModeChangeNumbersKey(), row: 3, page: 0)
     keyboard.addKey(Key.SpaceKey(), row: 3, page: 0)
@@ -238,7 +238,7 @@ func defaultLanguageSpecificKeyboard() -> Keyboard
 
 // The main alpha page for email mode has
 // a special bottom row with an at sign and period between the space bar and enter key
-func addEmailBottomRowKeys(defaultKeyboard: Keyboard)
+func addEmailBottomRowKeys(_ defaultKeyboard: Keyboard)
 {
     defaultKeyboard.addKey(Key.ModeChangeNumbersKey(), row: 3, page: 0)
     defaultKeyboard.addKey(Key.SpaceKey(), row: 3, page: 0)
@@ -264,7 +264,7 @@ func defaultKeyboardEmail() -> Keyboard {
 
 // The main alpha page for URL and Web Search modes has
 // a special bottom row with a slash and period between the space bar and enter key
-func addURLBottomRowKeys(defaultKeyboard: Keyboard)
+func addURLBottomRowKeys(_ defaultKeyboard: Keyboard)
 {
     defaultKeyboard.addKey(Key.ModeChangeNumbersKey(), row: 3, page: 0)
     defaultKeyboard.addKey(Key.SpaceKey(), row: 3, page: 0)
@@ -296,12 +296,12 @@ func defaultKeyboardNumber() -> Keyboard {
     AddCharacters(defaultKeyboard, characters: ["7", "8", "9", "-"], row: 2, page: 0)
     AddCharacters(defaultKeyboard, characters: ["00","0"], row: 3, page: 0)
 
-	defaultKeyboard.addKey(Key(.Backspace), row: 3, page: 0)
+	defaultKeyboard.addKey(Key(.backspace), row: 3, page: 0)
 
     return defaultKeyboard
 }
 
-func AddCharsHelper(defaultKeyboard: Keyboard, characters: [String], row: Int, page: Int, keyType: Key.KeyType)
+func AddCharsHelper(_ defaultKeyboard: Keyboard, characters: [String], row: Int, page: Int, keyType: Key.KeyType)
 {
     for c in characters {
         let key = Key(keyType)
@@ -312,13 +312,13 @@ func AddCharsHelper(defaultKeyboard: Keyboard, characters: [String], row: Int, p
     }
 }
 
-func AddSpecialCharacters (defaultKeyboard: Keyboard, characters: [String], row: Int, page: Int)
+func AddSpecialCharacters (_ defaultKeyboard: Keyboard, characters: [String], row: Int, page: Int)
 {
-    AddCharsHelper(defaultKeyboard, characters: characters, row: row, page: page, keyType: .SpecialCharacter)
+    AddCharsHelper(defaultKeyboard, characters: characters, row: row, page: page, keyType: .specialCharacter)
 }
 
-func AddCharacters (defaultKeyboard: Keyboard, characters: [String], row: Int, page: Int)
+func AddCharacters (_ defaultKeyboard: Keyboard, characters: [String], row: Int, page: Int)
 {
-    AddCharsHelper(defaultKeyboard, characters: characters, row: row, page: page, keyType: .Character)
+    AddCharsHelper(defaultKeyboard, characters: characters, row: row, page: page, keyType: .character)
 }
 

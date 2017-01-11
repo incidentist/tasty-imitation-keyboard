@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-var profile: ((id: String) -> Double?) = {
+var profile: ((_ id: String) -> Double?) = {
     var counterForName = Dictionary<String, Double>()
     var isOpen = Dictionary<String, Double>()
     
@@ -35,28 +35,28 @@ var profile: ((id: String) -> Double?) = {
 
 // Remove trailing and leading white space.
 // Treat nil as equivalent to the empty string.
-func TrimWhiteSpace(x : String?) -> String {
-    return x == nil ? "" : x!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+func TrimWhiteSpace(_ x : String?) -> String {
+    return x == nil ? "" : x!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
 }
 
-func characterIsPunctuation(character: Character) -> Bool {
+func characterIsPunctuation(_ character: Character) -> Bool {
     return character == "." || character == "!" || character == "?"
 }
 
-func characterIsNewline(character: Character) -> Bool {
+func characterIsNewline(_ character: Character) -> Bool {
     return character == "\n" || character == "\r"
 }
 
-func characterIsWhitespace(character: Character) -> Bool {
+func characterIsWhitespace(_ character: Character) -> Bool {
     // there are others, but who cares
     return character == " " || character == "\n" || character == "\r" || character == "\t"
 }
 
-func stringIsWhitespace(str: String?) -> Bool {
+func stringIsWhitespace(_ str: String?) -> Bool {
     return TrimWhiteSpace(str) == ""
 }
 
-func isInitCaps(string: String) -> Bool
+func isInitCaps(_ string: String) -> Bool
 {
     return string.characters.count > 0
         && ("A"..."Z").contains(string[string.startIndex])
@@ -69,29 +69,29 @@ class foo
 }
 
 // In the deployed app, JSON resources etc live in the main bundle but when running a unit test we're not running as the main bundle
-func getBundle() -> NSBundle {
+func getBundle() -> Bundle {
 
 #if UNIT_TESTS
     return NSBundle(forClass: foo.self)
 #else
-    return NSBundle.mainBundle()
+    return Bundle.main
 #endif
 
 }
 
-func loadJSON(fileName: String?) -> NSDictionary?
+func loadJSON(_ fileName: String?) -> NSDictionary?
 {
-    if let path = getBundle().pathForResource(fileName, ofType: "json")
+    if let path = getBundle().path(forResource: fileName, ofType: "json")
     {
-        if !NSFileManager().fileExistsAtPath(path) {
+        if !FileManager().fileExists(atPath: path) {
             NSLog("File does not exist at \(path)")
             return nil
         }
 
-        if let jsonData = NSData(contentsOfFile: path)
+        if let jsonData = try? Data(contentsOf: URL(fileURLWithPath: path))
         {
             do {
-                let JSON = try NSJSONSerialization.JSONObjectWithData(jsonData, options:NSJSONReadingOptions(rawValue: 0))
+                let JSON = try JSONSerialization.jsonObject(with: jsonData, options:JSONSerialization.ReadingOptions(rawValue: 0))
 
                 return JSON as? NSDictionary
             }
@@ -119,8 +119,8 @@ func isOpenAccessGranted() -> Bool {
 }
 
 // http://stackoverflow.com/questions/3552108/finding-closest-object-to-cgpoint b/c I'm lazy
-func distanceBetween(rect: CGRect, point: CGPoint) -> CGFloat {
-    if CGRectContainsPoint(rect, point) {
+func distanceBetween(_ rect: CGRect, point: CGPoint) -> CGFloat {
+    if rect.contains(point) {
         return 0
     }
 
@@ -144,15 +144,15 @@ func distanceBetween(rect: CGRect, point: CGPoint) -> CGFloat {
     return CGFloat(sqrt(a + b));
 }
 
-func CasedString(str : String, shiftState : ShiftState) -> String
+func CasedString(_ str : String, shiftState : ShiftState) -> String
 {
-    if shiftState == .Enabled
+    if shiftState == .enabled
     {
-        return str.capitalizedString
+        return str.capitalized
     }
-    else if shiftState == .Locked
+    else if shiftState == .locked
     {
-        return str.uppercaseString
+        return str.uppercased()
     }
     else
     {

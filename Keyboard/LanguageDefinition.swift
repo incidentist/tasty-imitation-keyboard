@@ -13,24 +13,24 @@ import Foundation
 //
 // Note that the language information says nothing about keyboard layout and doesn't attempt an exhaustive listing of the kbds that
 // could be used to type the language. We can determine programmatically elsewhere if a kbd contains all the necessary chars.
-public class LanguageDefinition {
+open class LanguageDefinition {
 
     // The ISO 639-1 language code.
     // REVIEW What to do about languages that don't have an ISO 639-1 code?
-    private let _langCode : String
+    fileprivate let _langCode : String
 
     // Name of the language in English
-    private let _englishName : String
+    fileprivate let _englishName : String
 
     // Name of the language in that language's native script
-    private let _nativeName : String
+    fileprivate let _nativeName : String
 
     // The name of the JSON keyboard definition file for the default keyboard for this language
-    private let _defaultKbd : String
+    fileprivate let _defaultKbd : String
 
     // Special symbols that this language uses within what we will consider to be words e.g. apostrophe for English means
     // that we will consider "dog's" to be a single word. Similarly the middle dot in Catalan etc.
-    private let _internalPunc : Set<String>
+    fileprivate let _internalPunc : Set<String>
 
     init(langCode: String,
         englishName: String, nativeName: String, defaultKbd: String, internalPunc: [String])
@@ -80,7 +80,7 @@ public class LanguageDefinition {
 
     // Default English language definition to be used in case of an emergency
     // e.g. failing to load language definitions from the JSON language definition file.
-    class private func EnglishLanguageDefinition() -> LanguageDefinition {
+    class fileprivate func EnglishLanguageDefinition() -> LanguageDefinition {
         return LanguageDefinition(
             langCode: "EN",
             englishName: "English",
@@ -93,7 +93,7 @@ public class LanguageDefinition {
 // Get and validate the current language to use
 // If what we think is the current language has been disabled in settings, we need to pick another language
 func CurrentLanguageCode() -> String {
-    return NSUserDefaults.standardUserDefaults().stringForKey(kActiveLanguageCode) ?? EnabledLanguageCodes()[0]
+    return UserDefaults.standard.string(forKey: kActiveLanguageCode) ?? EnabledLanguageCodes()[0]
 }
 
 func CurrentLanguageDefinition() -> LanguageDefinition? {
@@ -102,46 +102,46 @@ func CurrentLanguageDefinition() -> LanguageDefinition? {
 
 
 // Make the look up key for checking in user defaults which layout to use for language
-func languageKeyboardLayout(langCode: String) -> String
+func languageKeyboardLayout(_ langCode: String) -> String
 {
     return langCode + "_layout"
 }
 
-func getKeyboardLayoutNameForLanguageCode(langCode: String) -> String
+func getKeyboardLayoutNameForLanguageCode(_ langCode: String) -> String
 {
     let lookUpKey = languageKeyboardLayout(langCode)
-    return NSUserDefaults.standardUserDefaults().stringForKey(lookUpKey) ?? LanguageDefinitions.Singleton().KeyboardFileForLanguageCode(langCode) ?? "QWERTY"
+    return UserDefaults.standard.string(forKey: lookUpKey) ?? LanguageDefinitions.Singleton().KeyboardFileForLanguageCode(langCode) ?? "QWERTY"
 }
 
-func setKeyboardLayoutNameForLanguageCode(langCode: String, layout: String)
+func setKeyboardLayoutNameForLanguageCode(_ langCode: String, layout: String)
 {
     let lookUpKey = languageKeyboardLayout(langCode)
-    return NSUserDefaults.standardUserDefaults().setObject(layout, forKey: lookUpKey)
+    return UserDefaults.standard.set(layout, forKey: lookUpKey)
 }
 
-func setDefaultKeyboardLayoutNameForLanguageCode(langCode: String, layout: String)
+func setDefaultKeyboardLayoutNameForLanguageCode(_ langCode: String, layout: String)
 {
     let lookUpKey = languageKeyboardLayout(langCode)
 
-    let currentValue = NSUserDefaults.standardUserDefaults().stringForKey(lookUpKey)
+    let currentValue = UserDefaults.standard.string(forKey: lookUpKey)
     if currentValue == nil {
         setKeyboardLayoutNameForLanguageCode(langCode, layout: layout)
     }
 }
 
-func langCodeEnabledKey (langCode: String) -> String
+func langCodeEnabledKey (_ langCode: String) -> String
 {
     return langCode + "_Enabled"
 }
 
-func getLanguageCodeEnabled(langCode: String) -> Bool
+func getLanguageCodeEnabled(_ langCode: String) -> Bool
 {
-    return NSUserDefaults.standardUserDefaults().boolForKey(langCodeEnabledKey(langCode))
+    return UserDefaults.standard.bool(forKey: langCodeEnabledKey(langCode))
 }
 
-func setLanguageCodeEnabled(langCode: String, value: Bool)
+func setLanguageCodeEnabled(_ langCode: String, value: Bool)
 {
-    return NSUserDefaults.standardUserDefaults().setObject(value, forKey: langCodeEnabledKey(langCode))
+    return UserDefaults.standard.set(value, forKey: langCodeEnabledKey(langCode))
 }
 
 func EnabledLanguageCodes() -> [String]
@@ -171,50 +171,52 @@ func EnabledLanguageCodes() -> [String]
 private var _Singleton: LanguageDefinitions? = nil
 
 // Define the set of languages currently supported
-public class LanguageDefinitions {
-    public var definitions : [LanguageDefinition] = []
-    public var langCodeToDefinition: [String : LanguageDefinition] = [:]
+open class LanguageDefinitions {
+    open var definitions : [LanguageDefinition] = []
+    open var langCodeToDefinition: [String : LanguageDefinition] = [:]
 
 
-    private func extractLanguageDefinitions(allDefinitions: NSDictionary)
+    fileprivate func extractLanguageDefinitions(_ allDefinitions: NSDictionary)
     {
-        if let languages = allDefinitions["languages"] as? NSArray {
-
-            for language in languages {
-
-                if let languageProperties = language["language"] as? NSDictionary {
-
-
+        if let allLanguages = allDefinitions["languages"] {
+            for language in allLanguages as! [[String: NSDictionary]] {
+                if let languageProperties = language["language"] {
                     if let englishName = languageProperties["englishName"] as? String,
                         let nativeName = languageProperties["nativeName"] as? String,
                         let defaultKbd = languageProperties["defaultKbd"] as? String,
                         let internalPunc = languageProperties["internalPunc"] as? [String],
                         let langCode = languageProperties["langCode"] as? String {
 
-                            let definition = LanguageDefinition(
-                                langCode: langCode,
-                                englishName: englishName,
-                                nativeName: nativeName,
-                                defaultKbd: defaultKbd,
-                                internalPunc: internalPunc)
+                        let definition = LanguageDefinition(
+                            langCode: langCode,
+                            englishName: englishName,
+                            nativeName: nativeName,
+                            defaultKbd: defaultKbd,
+                            internalPunc: internalPunc)
 
-                            self.definitions.append(definition)
-                            self.langCodeToDefinition[definition.LangCode] = definition
+                        self.definitions.append(definition)
+                        self.langCodeToDefinition[definition.LangCode] = definition
 
-                            setDefaultKeyboardLayoutNameForLanguageCode(definition.LangCode, layout: definition.DefaultKbdName)
+                        setDefaultKeyboardLayoutNameForLanguageCode(definition.LangCode, layout: definition.DefaultKbdName)
                     }
                 }
-
                 
+
             }
         }
-        else {
-            makeDefaultLangDefinitions()
-        }
+
+
+//        if let languages =  as!  {
+//
+//
+//        }
+//        else {
+//            makeDefaultLangDefinitions()
+//        }
     }
 
     // If we can't process the langauge definition file for some reason make sure we at least define English
-    private func makeDefaultLangDefinitions()
+    fileprivate func makeDefaultLangDefinitions()
     {
         definitions = [LanguageDefinition.EnglishLanguageDefinition()]
         langCodeToDefinition["EN"] = definitions[0]
@@ -245,14 +247,14 @@ public class LanguageDefinitions {
 
     func LangCodes() -> [String]
     {
-        return langCodeToDefinition.keys.sort()
+        return langCodeToDefinition.keys.sorted()
     }
 
-    func DescriptiveNameForLangCode(langCode: String) -> String {
+    func DescriptiveNameForLangCode(_ langCode: String) -> String {
         return self.langCodeToDefinition[langCode]?.DescriptiveName ?? "UNKNOWN"
     }
 
-    func KeyboardFileForLanguageCode(langCode: String) -> String? {
+    func KeyboardFileForLanguageCode(_ langCode: String) -> String? {
         for lang in self.definitions {
             if lang.LangCode == langCode {
                 return lang.DefaultKbdName

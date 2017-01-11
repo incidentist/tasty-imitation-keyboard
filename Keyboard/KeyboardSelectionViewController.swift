@@ -12,8 +12,8 @@ let kChooseTitle = "Choose one of the following keyboards"
 
 class KeyboardSelectionViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     var tableView = UITableView()
-    private var _keyboardDefinitions : [String] = []
-    private var _langCode = "EN"
+    fileprivate var _keyboardDefinitions : [String] = []
+    fileprivate var _langCode = "EN"
 
     required init()
     {
@@ -48,50 +48,50 @@ class KeyboardSelectionViewController: UIViewController, UITableViewDataSource, 
 
         var allConstraints = [NSLayoutConstraint]()
 
-        let topRowConstraints = NSLayoutConstraint.constraintsWithVisualFormat(
-            "H:|-pad-[tableView]-pad-|",
+        let topRowConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|-pad-[tableView]-pad-|",
             options: [],
             metrics: metrics,
             views:views)
         allConstraints += topRowConstraints
 
-        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat(
-            "V:|[tableView]|",
+        let verticalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[tableView]|",
             options: [],
             metrics: metrics,
             views:views)
         allConstraints += verticalConstraints
 
-        NSLayoutConstraint.activateConstraints(allConstraints)
+        NSLayoutConstraint.activate(allConstraints)
     }
 
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self._keyboardDefinitions.count
     }
 
-    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 35
     }
 
-    func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
     }
 
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return kChooseTitle
     }
 
-    func formatHeader(label: UILabel?) {
+    func formatHeader(_ label: UILabel?) {
         let colorScheme = ColorScheme.ColorSchemeChooser(darkMode)
         label?.textColor = colorScheme.sectionLabelColor()
         label?.backgroundColor=colorScheme.sectionBackgroundColor()
     }
 
-    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let label = UILabel()
         label.text = kChooseTitle
 
@@ -100,7 +100,7 @@ class KeyboardSelectionViewController: UIViewController, UITableViewDataSource, 
         return label
     }
 
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let keyboardName = self._keyboardDefinitions[indexPath.row]
         let colorScheme = ColorScheme.ColorSchemeChooser(darkMode)
 
@@ -111,7 +111,7 @@ class KeyboardSelectionViewController: UIViewController, UITableViewDataSource, 
     }
 
     // Tapping anywhere within the row that shows a keyboard layout is sufficient to change to that layout
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         setKeyboardLayoutNameForLanguageCode(self._langCode, layout: self._keyboardDefinitions[indexPath.row])
 
         self.tableView.reloadData()

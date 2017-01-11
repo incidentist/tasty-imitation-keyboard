@@ -11,17 +11,17 @@ import Foundation
 var counter = 0
 
 enum ShiftState {
-    case Disabled
-    case Enabled
-    case Locked
+    case disabled
+    case enabled
+    case locked
     
     func uppercase() -> Bool {
         switch self {
-        case Disabled:
+        case .disabled:
             return false
-        case Enabled:
+        case .enabled:
             return true
-        case Locked:
+        case .locked:
             return true
         }
     }
@@ -34,7 +34,7 @@ class Keyboard {
         self.pages = []
     }
     
-    func addKey(key: Key, row: Int, page: Int) {
+    func addKey(_ key: Key, row: Int, page: Int) {
         if self.pages.count <= page {
             for _ in self.pages.count...page {
                 self.pages.append(Page())
@@ -52,7 +52,7 @@ class Page {
         self.rows = []
     }
     
-    func addKey(key: Key, row: Int) {
+    func addKey(_ key: Key, row: Int) {
         if self.rows.count <= row {
             for _ in self.rows.count...row {
                 self.rows.append([])
@@ -90,17 +90,17 @@ class SpecialUnicodeSymbols {
 }
 class Key: Hashable {
     enum KeyType {
-        case Character
-        case SpecialCharacter
-        case Shift
-        case Backspace
-        case ModeChange
-        case KeyboardChange
-        case Period
-        case Space
-        case Return
-        case Settings
-        case Other
+        case character
+        case specialCharacter
+        case shift
+        case backspace
+        case modeChange
+        case keyboardChange
+        case period
+        case space
+        case `return`
+        case settings
+        case other
     }
     
     var isTopRow: Bool
@@ -119,9 +119,9 @@ class Key: Hashable {
         get {
             switch self.type {
             case
-            .Character,
-            .SpecialCharacter,
-            .Period:
+            .character,
+            .specialCharacter,
+            .period:
                 return true
             default:
                 return false
@@ -131,12 +131,12 @@ class Key: Hashable {
     
     var isSpecial: Bool {
         get {
-            return self.type == .Shift
-            || self.type == .Backspace
-            || self.type == .ModeChange
-            || self.type == .KeyboardChange
-            || self.type == .Return
-            || self.type == .Settings
+            return self.type == .shift
+            || self.type == .backspace
+            || self.type == .modeChange
+            || self.type == .keyboardChange
+            || self.type == .return
+            || self.type == .settings
         }
     }
     
@@ -146,9 +146,9 @@ class Key: Hashable {
         }
     }
 
-    func getLongPressesForShiftState(shiftState: ShiftState) -> [String]
+    func getLongPressesForShiftState(_ shiftState: ShiftState) -> [String]
     {
-        if self.type == .KeyboardChange {
+        if self.type == .keyboardChange {
             let enabledLangs = EnabledLanguageCodes()
 
             var values : [String] = [SpecialUnicodeSymbols.NextKeyboardSymbol, SpecialUnicodeSymbols.GearSymbol]
@@ -162,7 +162,7 @@ class Key: Hashable {
 
             return values
         }
-        else if let cousins = shiftState == .Enabled || shiftState == .Locked ? self.shiftLongPress : self.longPress {
+        else if let cousins = shiftState == .enabled || shiftState == .locked ? self.shiftLongPress : self.longPress {
             return cousins
         }
         else {
@@ -208,14 +208,14 @@ class Key: Hashable {
         self.uppercaseOutput = shiftLabel
     }
     
-    func setLetter(letter: String) {
-        self.lowercaseOutput = (letter as NSString).lowercaseString
-        self.uppercaseOutput = (letter as NSString).uppercaseString
+    func setLetter(_ letter: String) {
+        self.lowercaseOutput = (letter as NSString).lowercased
+        self.uppercaseOutput = (letter as NSString).uppercased
         self.lowercaseKeyCap = self.lowercaseOutput
         self.uppercaseKeyCap = self.uppercaseOutput
     }
     
-    func outputForCase(uppercase: Bool) -> String {
+    func outputForCase(_ uppercase: Bool) -> String {
         if uppercase {
             return self.uppercaseOutput ?? self.lowercaseOutput ?? ""
         }
@@ -224,7 +224,7 @@ class Key: Hashable {
         }
     }
     
-    func keyCapForCase(uppercase: Bool) -> String {
+    func keyCapForCase(_ uppercase: Bool) -> String {
         if uppercase {
             return self.uppercaseKeyCap ?? self.lowercaseKeyCap ?? ""
         }
@@ -235,7 +235,7 @@ class Key: Hashable {
     
     class func SlashKey() -> Key
     {
-        let slashModel = Key(.Character)
+        let slashModel = Key(.character)
         slashModel.setLetter("/")
         
         return slashModel
@@ -243,7 +243,7 @@ class Key: Hashable {
     
     class func AtKey() -> Key
     {
-        let atModel = Key(.Character)
+        let atModel = Key(.character)
         atModel.setLetter("@")
         
         return atModel
@@ -252,14 +252,14 @@ class Key: Hashable {
     class func PeriodKey() -> Key
     {
         let longPressValues = ["'", "-", ",", "/"]
-        let dotModel = Key(type: .Character, label: ".", longPress: longPressValues, shiftLabel: ".", shiftLongPress: longPressValues)
+        let dotModel = Key(type: .character, label: ".", longPress: longPressValues, shiftLabel: ".", shiftLongPress: longPressValues)
 
         return dotModel
     }
 
     class func SpaceKey() -> Key
     {
-        let space = Key(.Space)
+        let space = Key(.space)
         space.uppercaseKeyCap = "space"
         space.uppercaseOutput = " "
         space.lowercaseOutput = " "
@@ -268,7 +268,7 @@ class Key: Hashable {
     
     class func ReturnKey() -> Key
     {
-        let returnKey = Key(.Return)
+        let returnKey = Key(.return)
         returnKey.uppercaseKeyCap = SpecialUnicodeSymbols.ReturnSymbol
         returnKey.uppercaseOutput = "\n"
         returnKey.lowercaseOutput = "\n"
@@ -277,7 +277,7 @@ class Key: Hashable {
 
     class func SearchKey() -> Key
     {
-        let returnKey = Key(.Return)
+        let returnKey = Key(.return)
         returnKey.uppercaseKeyCap = "Search"
         returnKey.uppercaseOutput = "\n"
         returnKey.lowercaseOutput = "\n"
@@ -286,7 +286,7 @@ class Key: Hashable {
     
     class func ModeChangeNumbersKey() -> Key
     {
-        let keyModeChangeNumbers = Key(.ModeChange)
+        let keyModeChangeNumbers = Key(.modeChange)
         keyModeChangeNumbers.uppercaseKeyCap = "123"
         keyModeChangeNumbers.toMode = 1
         return keyModeChangeNumbers
@@ -295,7 +295,7 @@ class Key: Hashable {
     
     class func ModeChangeLettersKey() -> Key
     {
-        let keyModeChangeLetters = Key(.ModeChange)
+        let keyModeChangeLetters = Key(.modeChange)
         keyModeChangeLetters.uppercaseKeyCap = "ABC"
         keyModeChangeLetters.toMode = 0
         return keyModeChangeLetters
@@ -303,7 +303,7 @@ class Key: Hashable {
 
     class func ModeChangeSpecialChars() -> Key
     {
-        let keyModeChangeSpecialCharacters = Key(.ModeChange)
+        let keyModeChangeSpecialCharacters = Key(.modeChange)
         keyModeChangeSpecialCharacters.uppercaseKeyCap = "#+="
         keyModeChangeSpecialCharacters.toMode = 2
 
@@ -313,7 +313,7 @@ class Key: Hashable {
 
     class func NextKbdKey() -> Key
     {
-        let nextKbdKey = Key(.KeyboardChange)
+        let nextKbdKey = Key(.keyboardChange)
 
         return nextKbdKey
     }

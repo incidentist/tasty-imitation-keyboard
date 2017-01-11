@@ -19,15 +19,15 @@ var wordStore : WordStore? = nil
 
 // Letters, combining marks etc.
 // Note that if a language uses the number 7 (e.g Squamish) as a letter then it would have to be listed as a word-internal punc
-let AllLetters = NSCharacterSet.letterCharacterSet()
+let AllLetters = CharacterSet.letters
 
 class WordStore
 {
-    private let langCode : String
-    private var words : [String : NSDate] = [:]
-    private var currentWord = ""
+    fileprivate let langCode : String
+    fileprivate var words : [String : Date] = [:]
+    fileprivate var currentWord = ""
 
-    private func WordStoreKey() -> String {
+    fileprivate func WordStoreKey() -> String {
         return "WordStore_" + self.langCode
     }
 
@@ -36,7 +36,7 @@ class WordStore
         self.langCode = langCode
 
         // Load previous words if present
-        self.words = (NSUserDefaults.standardUserDefaults().objectForKey(self.WordStoreKey()) as? [String : NSDate]) ?? self.words
+        self.words = (UserDefaults.standard.object(forKey: self.WordStoreKey()) as? [String : Date]) ?? self.words
 
         // Whatever the size restrictions when the words were persisted, make sure we trim to max size
         trimWords(MaxPersistedWords)
@@ -50,22 +50,22 @@ class WordStore
     //
     // Possibly TODO:
     // Skip over word-internal punctuation in the suggestion e.g. typing "ive" could match to "I've" (with word-internal apostrophe).
-    func getSuggestions(max: Int) -> [String]
+    func getSuggestions(_ max: Int) -> [String]
     {
         let completions = self.words.keys.filter({
-            $0.rangeOfString(self.currentWord,
-                options: [NSStringCompareOptions.AnchoredSearch, NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch]) != nil
+            $0.range(of: self.currentWord,
+                options: [NSString.CompareOptions.anchored, NSString.CompareOptions.caseInsensitive, NSString.CompareOptions.diacriticInsensitive]) != nil
         })
-            .sort({ self.words[$0]!.compare(self.words[$1]!) == NSComparisonResult.OrderedDescending })
+            .sorted(by: { self.words[$0]!.compare(self.words[$1]!) == ComparisonResult.orderedDescending })
             .prefix(max)
 
         return Array(completions)
     }
 
     // Update datetime for existing word or create new entry so we can track most recently used words
-    func recordWord(word : String)
+    func recordWord(_ word : String)
     {
-        self.words[word] = NSDate()
+        self.words[word] = Date()
 
         // If the user types "t", sees a completion "that" then selects the completion we were seeing
         // ghosts -- "t" would get added to the MRU list as well when the space was inserted.
@@ -77,7 +77,7 @@ class WordStore
 
     }
 
-    func trimWords(maxWords : Int)
+    func trimWords(_ maxWords : Int)
     {
         if self.words.count <= maxWords {
             return
@@ -88,10 +88,10 @@ class WordStore
         // (3) Convert back to a dict
         //
         // Note that this will arbitrarily drop words from the oldest date
-        let sortedReverseByDate = self.words.sort{ $0.1.compare($1.1) == NSComparisonResult.OrderedDescending }[0..<maxWords]
+        let sortedReverseByDate = self.words.sorted{ $0.1.compare($1.1) == ComparisonResult.orderedDescending }[0..<maxWords]
 
         // HACKHACK there are clever functional examples on the webz but KISS
-        self.words = [String : NSDate]()
+        self.words = [String : Date]()
         for (k, v) in sortedReverseByDate {
             self.words[k] = v
         }
@@ -101,7 +101,7 @@ class WordStore
     func persistWords()
     {
         trimWords(MaxPersistedWords)
-        NSUserDefaults.standardUserDefaults().setObject(self.words, forKey: self.WordStoreKey())
+        UserDefaults.standard.set(self.words, forKey: self.WordStoreKey())
     }
 
     var LangCode : String {
@@ -116,15 +116,15 @@ class WordStore
         }
     }
 
-    func recordChar(ch : String) {
+    func recordChar(_ ch : String) {
         if ch == "" {
             return
         }
 
-        if let wordInternalCharOfLanguage = CurrentLanguageDefinition()?.InternalPunc.contains(ch) where wordInternalCharOfLanguage == true {
+        if let wordInternalCharOfLanguage = CurrentLanguageDefinition()?.InternalPunc.contains(ch), wordInternalCharOfLanguage == true {
 
             self.currentWord += ch
-        } else if AllLetters.longCharacterIsMember(ch.unicodeScalars.first!.value) {
+        } else if AllLetters.contains(UnicodeScalar(ch.unicodeScalars.first!.value)!) {
 
             self.currentWord += ch
         } else {
@@ -142,7 +142,7 @@ class WordStore
         
         if self.currentWord.characters.count > 0 {
 
-            self.currentWord.removeAtIndex(self.currentWord.endIndex.predecessor())
+            self.currentWord.remove(at: self.currentWord.characters.index(before: self.currentWord.endIndex))
         }
     }
 

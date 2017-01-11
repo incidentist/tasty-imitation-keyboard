@@ -13,8 +13,8 @@ let kCheckmarkCharacter = "\u{2713}" // Unicode character "CHECK MARK (U+2713)"
 
 class CheckedTableViewCell: UITableViewCell {
 
-    var checkMark: UILabel = UILabel(frame: CGRectZero)
-    var label: UILabel = UILabel(frame: CGRectZero)
+    var checkMark: UILabel = UILabel(frame: CGRect.zero)
+    var label: UILabel = UILabel(frame: CGRect.zero)
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
 
@@ -28,7 +28,7 @@ class CheckedTableViewCell: UITableViewCell {
 
     convenience init(layout: String, isDefault: Bool, colorScheme: ColorScheme)
     {
-        self.init(style: UITableViewCellStyle.Default, reuseIdentifier: nil)
+        self.init(style: UITableViewCellStyle.default, reuseIdentifier: nil)
 
         self.checkMark.text = isDefault ? kCheckmarkCharacter : ""
         self.checkMark.translatesAutoresizingMaskIntoConstraints = false
@@ -41,7 +41,7 @@ class CheckedTableViewCell: UITableViewCell {
         self.applyColorScheme(colorScheme)
     }
 
-    func applyColorScheme(colorScheme: ColorScheme)
+    func applyColorScheme(_ colorScheme: ColorScheme)
     {
         self.backgroundColor = colorScheme.cellBackgroundColor()
         self.label.textColor = colorScheme.cellLabelColor()
@@ -57,28 +57,28 @@ class CheckedTableViewCell: UITableViewCell {
 
         var allConstraints = [NSLayoutConstraint]()
 
-        let topRowConstraints = NSLayoutConstraint.constraintsWithVisualFormat(
-            "H:|-pad-[label(>=150)]-[check]-pad-|",
+        let topRowConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|-pad-[label(>=150)]-[check]-pad-|",
             options: [],
             metrics: metrics,
             views:views)
         allConstraints += topRowConstraints
 
-        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat(
-            "V:|-pad-[label]",
+        let verticalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|-pad-[label]",
             options: [],
             metrics: metrics,
             views:views)
         allConstraints += verticalConstraints
 
-        let verticalConstraints2 = NSLayoutConstraint.constraintsWithVisualFormat(
-            "V:|-pad-[check]",
+        let verticalConstraints2 = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|-pad-[check]",
             options: [],
             metrics: metrics,
             views:views)
         allConstraints += verticalConstraints2
         
-        NSLayoutConstraint.activateConstraints(allConstraints)
+        NSLayoutConstraint.activate(allConstraints)
     }
     
 }

@@ -13,56 +13,56 @@ let LanguagesSection: Int = 2
 class ColorScheme
 {
     func labelTextColor() -> UIColor {
-        return UIColor.grayColor()
+        return UIColor.gray
     }
 
     func backTextColor() -> UIColor {
-        return UIColor.blackColor()
+        return UIColor.black
             //UIColor(red: 0/CGFloat(255), green: 122/CGFloat(255), blue: 255/CGFloat(255), alpha: 1)
     }
 
     func cellBackgroundColor() -> UIColor {
-        return UIColor.whiteColor().colorWithAlphaComponent(CGFloat(0.25))
+        return UIColor.white.withAlphaComponent(CGFloat(0.25))
     }
 
     func cellLabelColor() -> UIColor {
-        return UIColor.blackColor()
+        return UIColor.black
     }
 
     func cellLongLabelColor() -> UIColor {
-        return UIColor.grayColor()
+        return UIColor.gray
     }
 
     func cellKbdChangerColor() -> UIColor {
-        return UIColor.greenColor()
+        return UIColor.green
     }
 
 
     func tableBackgroundColor() -> UIColor {
-        return UIColor.whiteColor().colorWithAlphaComponent(1.0)
+        return UIColor.white.withAlphaComponent(1.0)
     }
 
     func sectionLabelColor() -> UIColor {
-        return UIColor.blackColor()
+        return UIColor.black
     }
 
     func sectionBackgroundColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
     func settingsBackgroundColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
     func backButtonBackgroundColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
     func effectsBackgroundColor() -> UIColor {
-        return UIColor.whiteColor().colorWithAlphaComponent(1)
+        return UIColor.white.withAlphaComponent(1)
     }
 
-    class func ColorSchemeChooser (darkMode : Bool) -> ColorScheme
+    class func ColorSchemeChooser (_ darkMode : Bool) -> ColorScheme
     {
         return darkMode ? DarkColorScheme() : ColorScheme()
     }
@@ -71,40 +71,40 @@ class ColorScheme
 class DarkColorScheme: ColorScheme
 {
     override func labelTextColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
     override func backTextColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
 //        return UIColor(red: 135/CGFloat(255), green: 206/CGFloat(255), blue: 250/CGFloat(255), alpha: 1)
     }
 
     override func cellBackgroundColor() -> UIColor {
-        return UIColor.darkGrayColor().colorWithAlphaComponent(CGFloat(0.5))
+        return UIColor.darkGray.withAlphaComponent(CGFloat(0.5))
     }
 
     override func cellLabelColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
     override func tableBackgroundColor() -> UIColor {
-        return UIColor.grayColor().colorWithAlphaComponent(1.0)
+        return UIColor.gray.withAlphaComponent(1.0)
     }
 
     override func sectionLabelColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
     override func sectionBackgroundColor() -> UIColor {
-        return UIColor.darkGrayColor().colorWithAlphaComponent(CGFloat(0.5))
+        return UIColor.darkGray.withAlphaComponent(CGFloat(0.5))
     }
 
     override func settingsBackgroundColor() -> UIColor {
-        return UIColor.darkGrayColor().colorWithAlphaComponent(CGFloat(0.5))
+        return UIColor.darkGray.withAlphaComponent(CGFloat(0.5))
     }
 
     override func effectsBackgroundColor() -> UIColor {
-        return UIColor.darkGrayColor().colorWithAlphaComponent(1)
+        return UIColor.darkGray.withAlphaComponent(1)
     }
 
     override func backButtonBackgroundColor() -> UIColor {
@@ -112,11 +112,11 @@ class DarkColorScheme: ColorScheme
     }
 
     override func cellLongLabelColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
     override func cellKbdChangerColor() -> UIColor {
-        return UIColor.whiteColor()
+        return UIColor.white
     }
 
 

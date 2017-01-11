@@ -20,9 +20,9 @@ class LightDarkView: UIView {
         self.darkMode = darkMode
         self.solidColorMode = solidColorMode
 
-        super.init(frame: CGRectZero)
+        super.init(frame: CGRect.zero)
 
-        self.hidden = true
+        self.isHidden = true
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -31,7 +31,7 @@ class LightDarkView: UIView {
         
         super.init(coder: aDecoder)
 
-        self.hidden = true
+        self.isHidden = true
     }
 
 

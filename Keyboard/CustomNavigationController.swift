@@ -11,34 +11,38 @@ import Foundation
 // Show a custom version of the UINavigationController that only appears when we're in the settings view controller
 // but disappears when we're done and go back to the keyboard.
 
+protocol CustomNavigationControllerDelegate : NSObjectProtocol {
+    func ChangeKeyboardLanguage(_ languageCode: String)
+}
+
+
 class CustomNavigationController : UINavigationController {
 
     var countViews: Int = 0
+    var customNavigationControllerDelegate: CustomNavigationControllerDelegate?
 
-    // Something of a hack: we may have to totally redraw the keyboard when we dismiss the nav controller
-    // e.g. if the user selected a different layout
-    var parent: KeyboardViewController?
-
-    override func pushViewController(viewController: UIViewController, animated: Bool) {
+    override func pushViewController(_ viewController: UIViewController, animated: Bool) {
         countViews += 1
 
         super.pushViewController(viewController, animated: animated)
     }
 
-    override func popViewControllerAnimated(animated: Bool) -> UIViewController? {
+    override func popViewController(animated: Bool) -> UIViewController? {
 
         if countViews == 3 { // The nav bar itself + dummy VC (to force the back button) + settings VC
 
             countViews = 0
-            super.popViewControllerAnimated(false)
-            self.dismissViewControllerAnimated(false, completion: nil) // Nav bar goes away, revealing keyboard again
-            self.parent?.ChangeKeyboardLanguage(CurrentLanguageCode()) // But no event triggers the keyboard redrawing e.g. to account for selecting a different layout; so explicitly redo the kbd
+            super.popViewController(animated: false)
+            self.dismiss(animated: false, completion: nil) // Nav bar goes away, revealing keyboard again
+            if let parentDelegate = self.customNavigationControllerDelegate {
+                parentDelegate.ChangeKeyboardLanguage(CurrentLanguageCode()) // But no event triggers the keyboard redrawing e.g. to account for selecting a different layout; so explicitly redo the kbd
+            }
 
             return nil
         }
         else {
             countViews -= 1
-            return super.popViewControllerAnimated(animated)
+            return super.popViewController(animated: animated)
         }
     }
 
@@ -51,10 +55,10 @@ class CustomNavigationController : UINavigationController {
         self.pushViewController(UIViewController(), animated: false)
     }
 
-    convenience init (parent: KeyboardViewController)
+    convenience init (customNavigationControllerDelegate: CustomNavigationControllerDelegate)
     {
         self.init()
-        self.parent = parent
+        self.customNavigationControllerDelegate = customNavigationControllerDelegate
     }
 
     required init?(coder aDecoder: NSCoder) {

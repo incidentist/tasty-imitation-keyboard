@@ -21,7 +21,7 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
 
     var viewController: KeyboardViewController?  = nil
 	
-    private func MakeLongPressGesturesRecognizer()
+    fileprivate func MakeLongPressGesturesRecognizer()
     {
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(ForwardingView.handleLongGesture(_:)))
         
@@ -36,10 +36,10 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
         
         super.init(frame: frame)
         
-        self.contentMode = UIViewContentMode.Redraw
-        self.multipleTouchEnabled = true
-        self.userInteractionEnabled = true
-        self.opaque = false
+        self.contentMode = UIViewContentMode.redraw
+        self.isMultipleTouchEnabled = true
+        self.isUserInteractionEnabled = true
+        self.isOpaque = false
 		
         self.MakeLongPressGesturesRecognizer()
     }
@@ -58,25 +58,25 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
     // then some weird optimization happens on UIKit's side where tapping down on a transparent pixel will
     // not actually recognize the touch. Having a manual drawRect fixes this behavior, even though it doesn't
     // actually do anything.
-    override func drawRect(rect: CGRect) {}
+    override func draw(_ rect: CGRect) {}
     
-    override func hitTest(point: CGPoint, withEvent event: UIEvent!) -> UIView? {
-        if self.hidden || self.alpha == 0 || !self.userInteractionEnabled {
+    override func hitTest(_ point: CGPoint, with event: UIEvent!) -> UIView? {
+        if self.isHidden || self.alpha == 0 || !self.isUserInteractionEnabled {
             return nil
         }
         else {
-            return CGRectContainsPoint(self.bounds, point) ? self : nil
+            return self.bounds.contains(point) ? self : nil
         }
     }
     
-    func handleControl(view: UIView?, controlEvent: UIControlEvents) {
+    func handleControl(_ view: UIView?, controlEvent: UIControlEvents) {
         if let control = view as? UIControl {
-            let targets = control.allTargets()
+            let targets = control.allTargets
             for target in targets {
-                if let actions = control.actionsForTarget(target, forControlEvent: controlEvent) {
+                if let actions = control.actions(forTarget: target, forControlEvent: controlEvent) {
                     for action in actions {
                         let selector = Selector(action)
-                        control.sendAction(selector, to: target, forEvent: nil)
+                        control.sendAction(selector, to: target, for: nil)
                         
                     }
                 }
@@ -84,35 +84,35 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
         }
     }
 
-	@IBAction func handleLongGesture(longPress: UIGestureRecognizer)
+	@IBAction func handleLongGesture(_ longPress: UIGestureRecognizer)
 	{
-		if (longPress.state == UIGestureRecognizerState.Ended)
+		if (longPress.state == UIGestureRecognizerState.ended)
 		{
 			
-			let position = longPress.locationInView(self)
+			let position = longPress.location(in: self)
 			let view = findNearestView(position)
 			
 			if view is KeyboardKey
 			{
-				NSNotificationCenter.defaultCenter().postNotificationName("hideExpandViewNotification", object: nil)
+				NotificationCenter.default.post(name: Notification.Name(rawValue: "hideExpandViewNotification"), object: nil)
 			}
 			
 			isLongPressEnable = false
 			
 			isLongPressKeyPress = true
 			
-			if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad
+			if UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad
 			{
-                (view as? KeyboardKey)?.highlighted = false
+                (view as? KeyboardKey)?.isHighlighted = false
 			}
 			
 		}
-        else if (longPress.state == UIGestureRecognizerState.Began)
+        else if (longPress.state == UIGestureRecognizerState.began)
         {
             
             isLongPressEnable = true
             
-            let position = longPress.locationInView(self)
+            let position = longPress.location(in: self)
             let view = findNearestView(position)
             
             if let v = view as? KeyboardKey {
@@ -120,25 +120,25 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
                 {
                     view!.tag = LongPressActivated
 
-                    self.handleControl(view, controlEvent: .TouchDownRepeat)
+                    self.handleControl(view, controlEvent: .touchDownRepeat)
                 }
             }
         }
 	}
 
 	
-	func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool
+	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool
 	{
 		if gestureRecognizer is UILongPressGestureRecognizer
 		{
-			if (gestureRecognizer.state == UIGestureRecognizerState.Possible)
+			if (gestureRecognizer.state == UIGestureRecognizerState.possible)
 			{
-				let position = touch.locationInView(self)
+				let position = touch.location(in: self)
                 return self.isLongPressEnableKey(findNearestView(position) as? KeyboardKey)
 			}
-			else if (gestureRecognizer.state == UIGestureRecognizerState.Ended)
+			else if (gestureRecognizer.state == UIGestureRecognizerState.ended)
 			{
-				let position = gestureRecognizer.locationInView(self)
+				let position = gestureRecognizer.location(in: self)
                 return self.isLongPressEnableKey(findNearestView(position) as? KeyboardKey)
 			}
 		}
@@ -149,13 +149,13 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
 		return false
 	}
 	
-	func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool
+	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool
 	{
 		return true
 	}
 	
     // TODO: there's a bit of "stickiness" to Apple's implementation
-    func findNearestView(position: CGPoint) -> UIView? {
+    func findNearestView(_ position: CGPoint) -> UIView? {
 
         if !self.bounds.contains(position) {
             return nil
@@ -165,7 +165,7 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
         
         for view in self.subviews {
             
-            if view.hidden {
+            if view.isHidden {
                 continue
             }
 
@@ -195,9 +195,9 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
     // reset tracked views without cancelling current touch
     func resetTrackedViews() {
         for view in self.touchToView.values {
-            self.handleControl(view, controlEvent: .TouchCancel)
+            self.handleControl(view, controlEvent: .touchCancel)
         }
-        self.touchToView.removeAll(keepCapacity: true)
+        self.touchToView.removeAll(keepingCapacity: true)
     }
 	
 	func resetPopUpViews() {
@@ -207,7 +207,7 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
 		}
 	}
 	
-    func ownView(newTouch: UITouch, viewToOwn: UIView?) -> Bool {
+    func ownView(_ newTouch: UITouch, viewToOwn: UIView?) -> Bool {
         var foundView = false
         
         if viewToOwn != nil {
@@ -229,10 +229,10 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
         return foundView
     }
     
-	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 
 		for touch in touches {
-			let position = touch.locationInView(self)
+			let position = touch.location(in: self)
 			let view = findNearestView(position)
 			
 			let viewChangedOwnership = self.ownView(touch, viewToOwn: view)
@@ -241,26 +241,26 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
 			{
 				if view != nil && !viewChangedOwnership
 				{
-                    self.handleControl(view, controlEvent: .TouchDown)
+                    self.handleControl(view, controlEvent: .touchDown)
 				}
 				
-				NSNotificationCenter.defaultCenter().postNotificationName("hideExpandViewNotification", object: nil)
+				NotificationCenter.default.post(name: Notification.Name(rawValue: "hideExpandViewNotification"), object: nil)
 				isLongPressEnable = false
 				
-				if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad
+				if UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad
 				{
-                    (view as? KeyboardKey)?.highlighted = false
+                    (view as? KeyboardKey)?.isHighlighted = false
 				}
 				
 			}
 			else
 			{
 				if !viewChangedOwnership {
-					self.handleControl(view, controlEvent: .TouchDown)
+					self.handleControl(view, controlEvent: .touchDown)
 					
 					if touch.tapCount > 1 {
 						// two events, I think this is the correct behavior but I have not tested with an actual UIControl
-						self.handleControl(view, controlEvent: .TouchDownRepeat)
+						self.handleControl(view, controlEvent: .touchDownRepeat)
 					}
 				}
                 else {
@@ -272,16 +272,16 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
 		}
 	}
 	
-	override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 		for touch in touches
 		{
-			let position = touch.locationInView(self)
+			let position = touch.location(in: self)
 			
 			if isLongPressEnable
 			{
                 if let expandedButtonView = self.getCYRView() {
 
-                    expandedButtonView.updateSelectedInputIndexForPoint(position)
+                    expandedButtonView.updateSelectedInputIndex(for: position)
 				}
 			}
 			else
@@ -291,33 +291,33 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
 				
 				if oldView != newView
 				{
-					self.handleControl(oldView, controlEvent: .TouchDragExit)
+					self.handleControl(oldView, controlEvent: .touchDragExit)
 					
 					let viewChangedOwnership = self.ownView(touch, viewToOwn: newView)
 					
 					if !viewChangedOwnership
 					{
-						self.handleControl(newView, controlEvent: .TouchDragEnter)
+						self.handleControl(newView, controlEvent: .touchDragEnter)
 					}
 					else
 					{
-						self.handleControl(newView, controlEvent: .TouchDragInside)
+						self.handleControl(newView, controlEvent: .touchDragInside)
 					}
 				}
 				else
 				{
-					self.handleControl(oldView, controlEvent: .TouchDragInside)
+					self.handleControl(oldView, controlEvent: .touchDragInside)
 				}
 			}
 		}
 	}
     
-    override func touchesEnded(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>?, with event: UIEvent?) {
         if let allTouches = touches {
             for touch in allTouches {
                 let view = self.touchToView[touch]
                 
-                let touchPosition = touch.locationInView(self)
+                let touchPosition = touch.location(in: self)
                 
                 if(isLongPressKeyPress == true)
                 {
@@ -328,22 +328,22 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
 
                                 self.resetPopUpViews()
 
-                                NSNotificationCenter.defaultCenter().postNotificationName("hideExpandViewNotification", object: nil, userInfo: ["text":inputOption])
+                                NotificationCenter.default.post(name: Notification.Name(rawValue: "hideExpandViewNotification"), object: nil, userInfo: ["text":inputOption])
                             }
                         }
                     }
                     
                     isLongPressKeyPress = false
                     
-                    if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad
+                    if UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad
                     {
-                        (view as? KeyboardKey)?.highlighted = false
+                        (view as? KeyboardKey)?.isHighlighted = false
                     }
                     
                 }
                 else
                 {
-                    self.handleControl(view, controlEvent: self.bounds.contains(touchPosition) ? .TouchUpInside : .TouchCancel)
+                    self.handleControl(view, controlEvent: self.bounds.contains(touchPosition) ? .touchUpInside : .touchCancel)
                 }
                 
                 self.touchToView[touch] = nil
@@ -351,20 +351,20 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
         }
     }
 
-    override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+    override func touchesCancelled(_ touches: Set<UITouch>?, with event: UIEvent?) {
         if let allTouches = touches {
             for touch in allTouches {
                 
                 let view = self.touchToView[touch]
                 
-                self.handleControl(view, controlEvent: .TouchCancel)
+                self.handleControl(view, controlEvent: .touchCancel)
                 
                 self.touchToView[touch] = nil
             }
         }
     }
 
-    func isLongPressEnableKey(key: KeyboardKey?) -> Bool {
+    func isLongPressEnableKey(_ key: KeyboardKey?) -> Bool {
 
         // REVIEW We need to determine whether the key that got pressed has a list of long presses for the current state
         // but the only way to get that is to go through a portal to the view controller. This seems unnecessarily convoluted.
@@ -373,7 +373,7 @@ class ForwardingView: UIView, UIGestureRecognizerDelegate {
             // Assume for now that decimal pad and number pad keys can't do long press.
             if self.currentMode == 0
             {
-                return keyboard_type != UIKeyboardType.DecimalPad && keyboard_type != UIKeyboardType.NumberPad
+                return keyboard_type != UIKeyboardType.decimalPad && keyboard_type != UIKeyboardType.numberPad
             }
         }
 
