@@ -821,16 +821,12 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
         self.nav?.pushViewController(vc, animated: true)
     }
     
-    func setCapsIfNeeded() -> Bool {
+    func setCapsIfNeeded() -> Void {
         if self.shouldAutoCapitalize() {
             self.shiftState = (self.shiftState == .locked) ? .locked : .enabled
-            
-            return true
         }
         else {
             self.shiftState = (self.shiftState == .locked) ? .locked : .disabled
-            
-            return false
         }
     }
     
