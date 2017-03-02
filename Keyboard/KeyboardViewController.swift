@@ -172,7 +172,9 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
     }
     
     func defaultsChanged(_ notification: Notification) {
-        self.updateKeyCaps(self.shiftState.uppercase())
+        OperationQueue.main.addOperation {
+            self.updateKeyCaps(self.shiftState.uppercase())
+        }
     }
     
     // without this here kludge, the height constraint for the keyboard does not work for some reason
@@ -406,27 +408,27 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
 
 	func hideExpandView(_ notification: Notification)
 	{
-		
-        if notification.userInfo != nil {
+		OperationQueue.main.addOperation {
+            if notification.userInfo != nil {
 
-            if let title = notification.userInfo!["text"] as? String {
+                if let title = notification.userInfo!["text"] as? String {
 
-                if !HandleKeyboardSelection(title) {
+                    if !self.HandleKeyboardSelection(title) {
 
-                    InsertText(CasedString(title, shiftState: self.shiftState))
+                        self.InsertText(CasedString(title, shiftState: self.shiftState))
+                    }
+
+                    self.setCapsIfNeeded()
                 }
-
-                self.setCapsIfNeeded()
             }
-		}
-		
-        if !self.forwardingView.isLongPressEnable {
 
-            self.view.bringSubview(toFront: self.bannerView!)
-		}
+            if !self.forwardingView.isLongPressEnable {
 
-		viewLongPopUp.isHidden = true
+                self.view.bringSubview(toFront: self.bannerView!)
+            }
 
+            self.viewLongPopUp.isHidden = true
+        }
 	}
 
     // TODO? Add special casing for default height and width for iPad? Previous code resulted in landscape view on iPad2 that was bigger than entire screen
