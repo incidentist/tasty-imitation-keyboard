@@ -236,7 +236,7 @@
     // Overlay path & shadow
     {
         CGFloat shadowAlpha = 0;
-        CGSize shadowOffset;
+        CGSize shadowOffset = CGSizeZero;
         
         switch ([UIDevice currentDevice].userInterfaceIdiom) {
             case UIUserInterfaceIdiomPhone:
@@ -246,8 +246,6 @@
                 
             case UIUserInterfaceIdiomPad:
                 shadowAlpha = 0.25;
-                shadowOffset = CGSizeZero;
-				
                 break;
                 
             default:
