@@ -109,22 +109,8 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
         return screenSize.width < screenSize.height ? UIInterfaceOrientation.portrait : UIInterfaceOrientation.landscapeLeft
     }
 
-    fileprivate func InitializeLayout()
-    {
-        self.forwardingView = ForwardingView(frame: CGRect.zero, viewController: self)
-        self.view.addSubview(self.forwardingView)
-
-        self.bannerView = self.createBanner()
-        for button in self.bannerView!.buttons {
-            button.addTarget(self, action: #selector(KeyboardViewController.didTapSuggestionButton(_:)), for: [.touchUpInside, .touchUpOutside, .touchDragOutside])
-            button.addTarget(self, action: #selector(KeyboardViewController.didTTouchDownSuggestionButton(_:)), for: [.touchDown, .touchDragInside, .touchDragEnter])
-            button.addTarget(self, action: #selector(KeyboardViewController.didTTouchExitDownSuggestionButton(_:)), for: [.touchDragExit, .touchCancel])
-        }
-
-        self.view.insertSubview(self.bannerView!, aboveSubview: self.forwardingView)
-
-        initializePopUp()
-
+    required init(coder: NSCoder) {
+        fatalError("NSCoding not supported")
     }
 
     init(delegate: TextInputProxy) {
@@ -140,34 +126,102 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
         self.shiftState = .disabled
         self.currentMode = 0
 
-        //sleep(30)
-        
         self.currentInterfaceOrientation = KeyboardViewController.getInterfaceOrientation()
 
         super.init(nibName: nil, bundle: nil)
 
-		InitializeLayout()
+        self.forwardingView = ForwardingView(frame: CGRect.zero, viewController: self)
+        self.view.addSubview(self.forwardingView)
+
+        self.bannerView = self.createBanner()
+        for button in self.bannerView!.buttons {
+            button.addTarget(self, action: #selector(KeyboardViewController.didTapSuggestionButton(_:)), for: [.touchUpInside, .touchUpOutside, .touchDragOutside])
+            button.addTarget(self, action: #selector(KeyboardViewController.didTTouchDownSuggestionButton(_:)), for: [.touchDown, .touchDragInside, .touchDragEnter])
+            button.addTarget(self, action: #selector(KeyboardViewController.didTTouchExitDownSuggestionButton(_:)), for: [.touchDragExit, .touchCancel])
+        }
+
+        self.view.insertSubview(self.bannerView!, aboveSubview: self.forwardingView)
+
+        button.initializePopup(self.forwardingView)
+        self.view.insertSubview(self.button, aboveSubview: self.forwardingView)
+
+        viewLongPopUp.isHidden = true
 
         NotificationCenter.default.addObserver(self, selector: #selector(KeyboardViewController.defaultsChanged(_:)), name: UserDefaults.didChangeNotification, object: nil)
 		NotificationCenter.default.addObserver(self, selector: #selector(KeyboardViewController.hideExpandView(_:)), name: NSNotification.Name(rawValue: "hideExpandViewNotification"), object: nil)
     }
 
+    override func loadView()
+    {
+        super.loadView()
+
+        self.bannerView = self.createBanner()
+        self.view.backgroundColor = UIColor(colorLiteralRed: 38/255, green: 53/255, blue: 71/255, alpha: 1.0)
+        self.view.insertSubview(self.bannerView!, belowSubview: self.forwardingView)
+    }
+
+    override func viewWillAppear(_ animated: Bool)
+    {
+        super.viewWillAppear(animated)
+
+        self.bannerView?.isHidden = false
+        self.keyboardHeight = self.heightForOrientation(self.currentInterfaceOrientation, withTopBanner: true)
+    }
+
+    var lastLayoutBounds: CGRect?
+    override func viewDidLayoutSubviews()
+    {
+        super.viewDidLayoutSubviews()
+
+        guard view.bounds != CGRect.zero else { return }
+
+        self.setupLayout(nil)
+
+        let orientationSavvyBounds = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: self.heightForOrientation(self.currentInterfaceOrientation, withTopBanner: false))
+
+        if (lastLayoutBounds != nil && lastLayoutBounds == orientationSavvyBounds) {
+            // do nothing
+        }
+        else {
+            let uppercase = self.shiftState.uppercase()
+            let characterUppercase = (UserDefaults.standard.bool(forKey: kSmallLowercase) ? uppercase : true)
+
+            self.forwardingView.frame = orientationSavvyBounds
+            self.layout?.layoutKeys(self.currentMode, uppercase: uppercase, characterUppercase: characterUppercase, shiftState: self.shiftState)
+            self.lastLayoutBounds = orientationSavvyBounds
+            self.setupKeys()
+        }
+
+        self.bannerView?.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: metric("topBanner"))
+
+        self.bannerView?.isHidden = textDocumentProxy.keyboardType == UIKeyboardType.numberPad || textDocumentProxy.keyboardType == UIKeyboardType.decimalPad
+
+        self.forwardingView.frame.origin = CGPoint(x: 0, y: self.view.bounds.height - self.forwardingView.bounds.height)
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        backspaceDelayTimer?.invalidate()
+        backspaceRepeatTimer?.invalidate()
+        popupDelayTimer?.invalidate()
+        traitPollingTimer?.invalidate()
+
+        backspaceDelayTimer = nil
+        backspaceRepeatTimer = nil
+        popupDelayTimer = nil
+        traitPollingTimer = nil
+
         WordStore.CurrentWordStore().persistWords()
     }
 
-    required init(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-
-    override func dismissKeyboard() {
+    override func dismissKeyboard()
+    {
+        NotificationCenter.default.removeObserver(self)
         WordStore.CurrentWordStore().persistWords()
     }
 
     deinit {
-        backspaceDelayTimer?.invalidate()
-        backspaceRepeatTimer?.invalidate()
-        
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -249,7 +303,6 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
         if !constraintsAdded {
             
             layoutHelper(keyboard)
-
         }
     }
     
@@ -267,50 +320,6 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
         return UIAccessibilityIsReduceTransparencyEnabled()
     }
     
-    var lastLayoutBounds: CGRect?
-	override func viewDidLayoutSubviews() {
-		if view.bounds == CGRect.zero {
-			return
-		}
-		
-		self.setupLayout(nil)
-        
-		let orientationSavvyBounds = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: self.heightForOrientation(self.currentInterfaceOrientation, withTopBanner: false))
-		
-		if (lastLayoutBounds != nil && lastLayoutBounds == orientationSavvyBounds) {
-			// do nothing
-		}
-		else {
-            let uppercase = self.shiftState.uppercase()
-			let characterUppercase = (UserDefaults.standard.bool(forKey: kSmallLowercase) ? uppercase : true)
-			
-			self.forwardingView.frame = orientationSavvyBounds
-			self.layout?.layoutKeys(self.currentMode, uppercase: uppercase, characterUppercase: characterUppercase, shiftState: self.shiftState)
-			self.lastLayoutBounds = orientationSavvyBounds
-			self.setupKeys()
-		}
-		
-		self.bannerView?.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: metric("topBanner"))
-		
-		self.bannerView?.isHidden = textDocumentProxy.keyboardType == UIKeyboardType.numberPad || textDocumentProxy.keyboardType == UIKeyboardType.decimalPad
-
-		self.forwardingView.frame.origin = CGPoint(x: 0, y: self.view.bounds.height - self.forwardingView.bounds.height)
-		
-	}
-	
-    override func loadView() {
-        super.loadView()
-		
-        self.bannerView = self.createBanner()
-        self.view.backgroundColor = UIColor(colorLiteralRed: 38/255, green: 53/255, blue: 71/255, alpha: 1.0)
-        self.view.insertSubview(self.bannerView!, belowSubview: self.forwardingView)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        self.bannerView?.isHidden = false
-        self.keyboardHeight = self.heightForOrientation(self.currentInterfaceOrientation, withTopBanner: true)
-    }
-	
     var currentInterfaceOrientation : UIInterfaceOrientation
     
     override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
@@ -560,11 +569,6 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
     /////////////////////
     // POPUP DELAY END //
     /////////////////////
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated
-    }
 
     // TODO: this is currently not working as intended; only called when selection changed -- iOS bug
 
@@ -919,15 +923,6 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
         return SuggestionView(darkMode: false, solidColorMode: self.solidColorMode())
     }
     
-	// MARK: Added methods for extra features
-	func initializePopUp()
-	{
-        button.initializePopup(self.forwardingView)
-		self.view.insertSubview(self.button, aboveSubview: self.forwardingView)
-
-        viewLongPopUp.isHidden = true
-	}
-
 	func didTTouchExitDownSuggestionButton(_ sender: AnyObject?)
 	{
         if let button = sender as? UIButton {

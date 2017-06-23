@@ -19,7 +19,7 @@ protocol CustomNavigationControllerDelegate : NSObjectProtocol {
 class CustomNavigationController : UINavigationController {
 
     var countViews: Int = 0
-    var customNavigationControllerDelegate: CustomNavigationControllerDelegate?
+    weak var customNavigationControllerDelegate: CustomNavigationControllerDelegate?
 
     override func pushViewController(_ viewController: UIViewController, animated: Bool) {
         countViews += 1
