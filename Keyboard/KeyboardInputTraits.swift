@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 Alexei Baboulevitch. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 //        optional var autocorrectionType: UITextAutocorrectionType { get set } // default is UITextAutocorrectionTypeDefault
 //        @availability(iOS, introduced=5.0)

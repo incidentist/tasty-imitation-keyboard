@@ -6,7 +6,7 @@
 //  Copyright © 2016 Apple. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 // Show a custom version of the UINavigationController that only appears when we're in the settings view controller
 // but disappears when we're done and go back to the keyboard.

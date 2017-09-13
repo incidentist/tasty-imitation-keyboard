@@ -6,7 +6,7 @@
 //  Copyright © 2015 Apple. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 let kCompatibleLayouts = "Compatible Keyboard Layouts"
 let kCheckmarkCharacter = "\u{2713}" // Unicode character "CHECK MARK (U+2713)"
