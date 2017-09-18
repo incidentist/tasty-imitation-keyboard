@@ -156,7 +156,7 @@ class KeyboardViewController: UIInputViewController, CustomNavigationControllerD
         super.loadView()
 
         self.bannerView = self.createBanner()
-        self.view.backgroundColor = UIColor(colorLiteralRed: 38/255, green: 53/255, blue: 71/255, alpha: 1.0)
+        self.view.backgroundColor = UIColor(red: 38/255, green: 53/255, blue: 71/255, alpha: 1.0)
         self.view.insertSubview(self.bannerView!, belowSubview: self.forwardingView)
     }
 
