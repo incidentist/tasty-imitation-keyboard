@@ -197,7 +197,9 @@ class LanguageSettingsViewController: UIViewController, UITableViewDataSource, U
 
         // We have to explicitly redraw the section headings or they stay the same color if the user
         // flips between dark mode and light mode.
-        self.tableView.reloadSections(IndexSet(integersIn: NSMakeRange(0, settingsList.count).toRange()!), with: UITableViewRowAnimation.automatic)
+
+        guard let range = Range.init(NSMakeRange(0, settingsList.count)) else { return }
+        self.tableView.reloadSections(IndexSet(integersIn: range), with: UITableViewRowAnimation.automatic)
 
             for cell in self.tableView.visibleCells {
                 (cell as? DefaultSettingsTableViewCell)?.applyColorScheme(colorScheme)
@@ -205,7 +207,7 @@ class LanguageSettingsViewController: UIViewController, UITableViewDataSource, U
 
     }
 
-    func toggleSetting(_ sender: UISwitch) {
+    @objc func toggleSetting(_ sender: UISwitch) {
         if let cell = sender.superview as? UITableViewCell {
             if let indexPath = self.tableView.indexPath(for: cell) {
                 let descriptor = self.settingsList[indexPath.section].1[indexPath.row]
